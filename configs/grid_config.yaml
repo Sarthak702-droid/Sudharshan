@@ -1,0 +1,15 @@
+grid:
+  grid_size_m: 10
+  overlap_ratio: 0.20
+  max_overlap_ratio: 0.25
+  step_size_m: 8
+
+flow:
+  method: optical_flow
+  update_every_n_frames: 5
+
+risk:
+  density_yellow: 2.0
+  density_orange: 3.0
+  density_red: 4.0
+  low_speed_mps: 0.35
