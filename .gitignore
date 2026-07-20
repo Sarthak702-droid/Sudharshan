@@ -22,9 +22,53 @@ venv.bak/
 .DS_Store
 
 # Datasets and Archives
+datasets/*
+!datasets/__init__.py
+!datasets/basedataset.py
+!datasets/common.py
+!datasets/get_density_map_gaussian.m
+!datasets/get_dot_map.m
+!datasets/preapre_NWPU.m
+!datasets/setting/
+datasets/setting/*
+!datasets/setting/__init__.py
+!datasets/setting/NWPU.py
+data/
+ShanghaiTech/
+VisDrone*/
+NWPU-Crowd/
 *.zip
 *.tar.gz
 *.tar
 *.gz
 *.rar
 *.7z
+
+# Generated labels, evaluation results, media, and local databases
+configs/labels/
+outputs/
+rendered_frames/
+*.db
+*.sqlite
+*.sqlite3
+*.mp4
+*.avi
+*.mov
+
+# Model checkpoints and training artifacts
+checkpoints/
+saved_models/
+SCALNet/checkpoints/
+SCALNet/outputs/
+*.pth
+*.pt
+*.h5
+*.onnx
+*.onnx.data
+
+# Test and tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+coverage.xml
+.coverage

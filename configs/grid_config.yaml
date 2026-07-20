@@ -1,15 +1,36 @@
+# Sudharshan AI - Configuration Settings
+
+# Grid division rules (Monitored areas partitioned into overlapping cells)
 grid:
-  grid_size_m: 10
-  overlap_ratio: 0.20
-  max_overlap_ratio: 0.25
-  step_size_m: 8
+  grid_size_px: 100       # Size of each grid cell in pixels (used for visual feeds)
+  overlap_ratio: 0.20      # Ratio of overlap (10% to 20% recommended, max 25%)
+  max_overlap_ratio: 0.25  # Strict maximum limit to prevent double counting issues
+  grid_size_m: 10          # Physical size equivalent in meters (for calibrated cameras)
+  step_size_m: 8           # Physical step size in meters matching 20% overlap
 
+# Motion and Flow estimation settings
 flow:
-  method: optical_flow
-  update_every_n_frames: 5
+  method: dis              # Optical flow estimation method: 'dis' (fast) or 'farneback' (robust)
+  normal_speed_px: 3.0     # Expected normal walking motion magnitude in pixels/frame
+  update_every_n_frames: 1 # Telemetry update rate (process every N frames)
+  min_motion_px: 0.05      # Ignore sub-pixel angle noise below this magnitude
+  max_motion_px: 40.0      # Reject implausible vectors/outliers above this magnitude
+  scene_cut_threshold: 45.0 # Mean gray-level jump that invalidates a frame pair
+  min_blur_score: 12.0     # Laplacian variance used in flow confidence
+  meters_per_pixel: null   # Set only after camera calibration; enables m/s telemetry
 
+# Risk scoring and alert thresholds
 risk:
-  density_yellow: 2.0
-  density_orange: 3.0
-  density_red: 4.0
-  low_speed_mps: 0.35
+  density_red: 4.0         # Critical density (people count threshold per unit cell)
+  low_speed_mps: 0.35      # Stagnation speed drop trigger (meters per second)
+  expected_direction: EAST # Default expected crowd flow direction (EAST, WEST, etc.)
+  min_confidence: 0.60     # Suppress automatic alerts below this reliability
+  crowd_presence_count: 1.0
+  crowd_class_thresholds: [1.0, 3.0, 6.0, 10.0] # EMPTY/SPARSE/MODERATE/DENSE/CRITICAL
+  crowd_density_thresholds: [0.5, 2.0, 4.0, 6.0] # people/m2 when ground calibration exists
+
+# Go Backend Settings for Stage 2 Live Dashboard Integration
+backend:
+  enabled: true            # Set to true when the Go backend server is running on port 8080
+  base_url: http://localhost:8080
+  telemetry_path: /api/v1/telemetry/grid-metrics
