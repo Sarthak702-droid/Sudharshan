@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sudharshan AI Crowd Flow Intelligence Dashboard for Rath Yatra management.">
+    <title>Sudharshan AI — Crowd Flow Intelligence Dashboard</title>
+    <style>
+        /* Base Design System - Sleek Premium Dark Mode */
+        :root {
+            --bg-base: #0a0c10;
+            --bg-surface: #12161f;
+            --bg-card: #1a1f2c;
+            --border-color: rgba(255, 255, 255, 0.08);
+
+            --color-primary: #3b82f6;
+            --color-success: #2ecc71;
+            --color-warning: #f1c40f;
+            --color-danger: #e74c3c;
+            --color-orange: #e67e22;
+            --color-text-main: #f3f4f6;
+            --color-text-muted: #9ca3af;
+
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-base);
+            color: var(--color-text-main);
+            overflow-x: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Layout Grid */
+        header {
+            height: 64px;
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 10;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-danger));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            letter-spacing: -0.5px;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: linear-gradient(to right, #f3f4f6, #9ca3af);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--color-text-main);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .header-btn.active {
+            background: var(--color-primary);
+            border-color: var(--color-primary);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+        }
+
+        .status-tag {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(46, 204, 113, 0.1);
+            color: var(--color-success);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(46, 204, 113, 0.2);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--color-success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.4; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Main Workspace Container */
+        .workspace {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Operations Mode Panel */
+        .panel-ops {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Replay Split Screen */
+        .split-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Video Feed Panel */
+        .video-panel {
+            flex: 7;
+            background-color: #050608;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 16px;
+        }
+
+        .video-wrapper {
+            position: relative;
+            max-width: 100%;
+            max-height: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        video {
+            display: block;
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 8px;
+        }
+
+        .video-canvas-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: all;
+            cursor: crosshair;
+        }
+
+        /* Control HUD Bar */
+        .player-hud {
+            width: 100%;
+            background-color: var(--bg-surface);
+            border-top: 1px solid var(--border-color);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .hud-btn {
+            background: none;
+            border: none;
+            color: var(--color-text-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-fast);
+        }
+
+        .hud-btn:hover {
+            color: var(--color-primary);
+            transform: scale(1.1);
+        }
+
+        .progress-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 11px;
+            font-family: monospace;
+            color: var(--color-text-muted);
+        }
+
+        input[type="range"] {
+            flex: 1;
+            accent-color: var(--color-primary);
+            height: 4px;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        /* Right Telemetry Drawer */
+        .sidebar {
+            flex: 3;
+            background-color: var(--bg-surface);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            border-left: 1px solid var(--border-color);
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--color-text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        /* Telemetry Cards */
+        .metric-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: var(--transition-fast);
+        }
+
+        .metric-card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            font-weight: 600;
+        }
+
+        .metric-val {
+            font-size: 24px;
+            font-weight: 800;
+            font-family: monospace;
+        }
+
+        /* Alert Panel */
+        .alerts-log {
+            background-color: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .alert-item {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 12px;
+            transition: var(--transition-fast);
+        }
+
+        .alert-item:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .alert-item.danger { border-left: 3px solid var(--color-danger); }
+        .alert-item.warning { border-left: 3px solid var(--color-orange); }
+
+        .alert-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--color-text-muted);
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .alert-desc {
+            font-weight: 700;
+        }
+
+        /* Analytics Chart Section */
+        .analytics-bar {
+            height: 180px;
+            background-color: var(--bg-surface);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            padding: 12px 24px;
+            gap: 24px;
+        }
+
+        .chart-box {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .svg-chart {
+            width: 100%;
+            height: 100px;
+            margin-top: 8px;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 6px;
+        }
+
+        /* Labeling Suite Panel */
+        .panel-labeler {
+            display: none;
+            flex: 1;
+            overflow: hidden;
+            background-color: var(--bg-base);
+        }
+
+        .labeler-layout {
+            display: flex;
+            height: 100%;
+            width: 100%;
+        }
+
+        .labeler-workspace {
+            flex: 7;
+            background-color: #07090e;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 24px;
+        }
+
+        .canvas-container {
+            position: relative;
+            max-width: 100%;
+            max-height: 75vh;
+            border-radius: 8px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .canvas-img {
+            display: block;
+            max-width: 100%;
+            max-height: 70vh;
+        }
+
+        .labeler-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        .labeler-sidebar {
+            flex: 3;
+            background-color: var(--bg-surface);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .labeler-controls-bar {
+            width: 100%;
+            background-color: var(--bg-surface);
+            border-top: 1px solid var(--border-color);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-action {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--color-text-main);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-action:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-action.primary {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        .btn-action.primary:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-action.danger-btn {
+            background-color: rgba(231, 76, 60, 0.15);
+            border-color: rgba(231, 76, 60, 0.3);
+            color: var(--color-danger);
+        }
+
+        .btn-action.danger-btn:hover {
+            background-color: rgba(231, 76, 60, 0.25);
+        }
+
+        .path-input {
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px 14px;
+            color: var(--color-text-main);
+            font-family: monospace;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .path-input:focus {
+            border-color: var(--color-primary);
+        }
+
+        /* Frames List */
+        .frames-list {
+            background-color: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .frame-item {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .frame-item:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .frame-item.selected {
+            background-color: rgba(59, 130, 246, 0.15);
+            border-left: 3px solid var(--color-primary);
+        }
+
+        .dot-badge {
+            background-color: var(--color-primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        /* Overlay detail popup */
+        .info-overlay {
+            position: absolute;
+            background: rgba(18, 22, 31, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 14px;
+            width: 240px;
+            pointer-events: none;
+            display: none;
+            z-index: 100;
+            font-size: 11px;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-lbl { color: var(--color-text-muted); font-weight: 600;}
+        .info-val { font-weight: 700; font-family: monospace;}
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Header -->
+    <header>
+        <div class="header-logo">
+            <div class="logo-icon">S</div>
+            <div class="logo-text">SUDHARSHAN AI</div>
+            <div class="status-tag" id="system-status-tag" style="background:rgba(241, 196, 15, 0.1); color:var(--color-warning); border-color:rgba(241, 196, 15, 0.2)">
+                <div class="status-dot" id="system-status-dot" style="background-color:var(--color-warning)"></div>
+                <span id="system-status-text">Connecting...</span>
+            </div>
+        </div>
+        <div class="header-controls">
+            <button class="header-btn active" id="btn-mode-ops" onclick="switchMode('ops')">
+                <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/></svg>
+                Operations Replay
+            </button>
+            <button class="header-btn" id="btn-mode-label" onclick="switchMode('label')">
+                <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/></svg>
+                Crowd Labeler
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="workspace">
+
+        <!-- MODE 1: Operations Replay & Live Inspection Dashboard -->
+        <div class="panel-ops" id="panel-ops">
+            <div class="split-container">
+
+                <!-- Main Operations Video Center -->
+                <div class="video-panel">
+                    <div class="video-wrapper">
+                        <img id="player-frame" src="" alt="Operations Feed" style="display:block; max-width:100%; max-height:70vh; border-radius:8px; width:100%; height:100%; object-fit:contain;" />
+                        <canvas class="video-canvas-overlay" id="overlay-canvas"></canvas>
+
+                        <!-- Hover detail card -->
+                        <div class="info-overlay" id="hover-overlay">
+                            <div class="info-row"><span class="info-lbl">Grid ID</span><span class="info-val" id="pop-grid-id">G_00_00</span></div>
+                            <div class="info-row"><span class="info-lbl">Crowd Count</span><span class="info-val" id="pop-count">0</span></div>
+                            <div class="info-row"><span class="info-lbl">Flow Speed</span><span class="info-val" id="pop-speed">STATIC</span></div>
+                            <div class="info-row"><span class="info-lbl">Flow Coherence</span><span class="info-val" id="pop-coherence">100%</span></div>
+                            <div class="info-row"><span class="info-lbl">Risk Level</span><span class="info-val" id="pop-risk" style="color:var(--color-success)">GREEN</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side Telemetry Drawer -->
+                <div class="sidebar">
+                    <div>
+                        <div class="section-title">Operations Metrics</div>
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span class="metric-label">Estimated Total Crowd</span>
+                            </div>
+                            <span class="metric-val" id="tele-crowd-total">0</span>
+                        </div>
+                        <div class="metric-card" style="margin-top:12px">
+                            <div class="metric-header">
+                                <span class="metric-label">Congested Grids Count</span>
+                            </div>
+                            <span class="metric-val" id="tele-congested" style="color:var(--color-orange)">0</span>
+                        </div>
+                    </div>
+
+                    <div style="flex:1; display:flex; flex-direction:column;">
+                        <div class="section-title">Active Alerts Panel</div>
+                        <div class="alerts-log" id="alerts-log-container">
+                            <div style="padding:20px; text-align:center; color:var(--color-text-muted); font-size:12px;">
+                                No active risk alerts inside corridor.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Playback Control Bar -->
+            <div class="player-hud">
+                <button class="hud-btn" onclick="togglePlay()">
+                    <svg id="play-icon" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/></svg>
+                </button>
+                <div class="progress-container">
+                    <span id="current-time-label">0:00</span>
+                    <input type="range" id="progress-slider" min="0" max="100" value="0" oninput="seekVideo(this.value)">
+                    <span id="duration-label">0:00</span>
+                </div>
+            </div>
+
+            <!-- Bottom Analytics Panel -->
+            <div class="analytics-bar">
+                <div class="chart-box">
+                    <div class="section-title">Crowd Density Trend</div>
+                    <svg class="svg-chart" id="chart-density"></svg>
+                </div>
+                <div class="chart-box">
+                    <div class="section-title">Average Flow Speed Trend</div>
+                    <svg class="svg-chart" id="chart-speed"></svg>
+                </div>
+                <div class="chart-box">
+                    <div class="section-title">Congestion Index Trend</div>
+                    <svg class="svg-chart" id="chart-congestion"></svg>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MODE 2: Custom Crowd Labeling Suite -->
+        <div class="panel-labeler" id="panel-labeler">
+            <div class="labeler-layout">
+
+                <!-- Center Canvas Annotation Area -->
+                <div class="labeler-workspace">
+                    <div class="canvas-container">
+                        <img class="canvas-img" id="labeler-img" src="" alt="Select a sequence frame to begin labeling">
+                        <canvas class="labeler-canvas" id="canvas-dots" onclick="canvasClick(event)"></canvas>
+                    </div>
+                </div>
+
+                <!-- Right Side Labeler Controls -->
+                <div class="labeler-sidebar">
+                    <div>
+                        <div class="section-title">1. Target Data Location</div>
+                        <input class="path-input" id="input-dataset-path" type="text" placeholder="/path/to/frames_directory" value="/home/sarthaktripathy/Documents/Sudharsan/VisDrone-MOT/VisDrone2019-MOT-val/sequences/uav0000117_02622_v">
+                        <button class="btn-action" style="margin-top:10px; width:100%;" onclick="scanCustomPath()">
+                            Scan & Load Sequence
+                        </button>
+                    </div>
+
+                    <div style="flex:1; display:flex; flex-direction:column;">
+                        <div class="section-title">2. Sequence Frames</div>
+                        <div class="frames-list" id="label-frames-container">
+                            <div style="padding:20px; text-align:center; color:var(--color-text-muted); font-size:12px;">
+                                Load a directory path to see frame list.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="section-title">Expected Route Flow</div>
+                        <select class="path-input" id="select-expected-dir">
+                            <option value="EAST">EAST (Rightward)</option>
+                            <option value="WEST">WEST (Leftward)</option>
+                            <option value="NORTH">NORTH (Upward)</option>
+                            <option value="SOUTH">SOUTH (Downward)</option>
+                            <option value="NORTH_EAST">NORTH EAST</option>
+                            <option value="NORTH_WEST">NORTH WEST</option>
+                            <option value="SOUTH_EAST">SOUTH EAST</option>
+                            <option value="SOUTH_WEST">SOUTH WEST</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <div class="section-title">Labeler Operations</div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <button class="btn-action danger-btn" onclick="clearCurrentFrame()">Clear Frame</button>
+                            <button class="btn-action" onclick="copyFromPreviousFrame()">Copy Prev Frame</button>
+                        </div>
+                        <button class="btn-action primary" style="margin-top:12px; width:100%;" onclick="saveAnnotations()">
+                            Save Labels
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer control bar for labeler -->
+            <div class="labeler-controls-bar">
+                <div class="control-group">
+                    <button class="btn-action" onclick="stepFrame(-1)">Previous Frame</button>
+                    <span id="labeler-frame-counter">Frame 0 / 0</span>
+                    <button class="btn-action" onclick="stepFrame(1)">Next Frame</button>
+                </div>
+                <button class="btn-action primary" style="padding: 10px 24px;" onclick="triggerPipeline()">
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16" style="margin-right:8px;"><path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/></svg>
+                    Run Flow & Density Analysis
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Frontend logic script -->
+    <script>
+        // State variables
+        let currentMode = 'ops';
+        let telemetryData = [];
+        let framesCount = 0;
+        let selectedFrameIdx = 0;
+        let frameList = [];
+        let currentSequencePath = '';
+        let currentSequenceName = '';
+        let labels = {}; // Stores { "frame_name": [{"x": x, "y": y}, ...] }
+        let gridLayout = []; // Extracted from metrics
+
+        const playerFrame = document.getElementById("player-frame");
+        const progressSlider = document.getElementById("progress-slider");
+        const overlayCanvas = document.getElementById("overlay-canvas");
+        const overlayCtx = overlayCanvas.getContext("2d");
+
+        // Canvas Player state variables
+        let isPlaying = false;
+        let playbackInterval = null;
+        let currentFrameIdx = 0;
+        let totalFrames = 0;
+        let totalDuration = 0.0;
+        const fps = 15;
+        let wsConnection = null;
+
+        // 1. Mode Switching
+        function switchMode(mode) {
+            currentMode = mode;
+            document.getElementById("btn-mode-ops").classList.toggle("active", mode === 'ops');
+            document.getElementById("btn-mode-label").classList.toggle("active", mode === 'label');
+            document.getElementById("panel-ops").style.display = mode === 'ops' ? 'flex' : 'none';
+            document.getElementById("panel-labeler").style.display = mode === 'label' ? 'flex' : 'none';
+
+            if (mode === 'label' && frameList.length === 0) {
+                // If opening labeler and list is empty, trigger a path scan
+                scanCustomPath();
+            }
+        }
+
+        // 2. Playback Control (Image-Sequence Replay Engine)
+        function togglePlay() {
+            if (totalFrames === 0) return;
+            if (isPlaying) {
+                pausePlayback();
+            } else {
+                startPlayback();
+            }
+        }
+
+        function startPlayback() {
+            isPlaying = true;
+            document.getElementById("play-icon").innerHTML = `<svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/></svg>`;
+            playbackInterval = setInterval(() => {
+                currentFrameIdx++;
+                if (currentFrameIdx >= totalFrames) {
+                    currentFrameIdx = 0; // Loop playback
+                }
+                renderCurrentFrame();
+            }, 1000 / fps);
+        }
+
+        // 3. Pause Playback
+        function pausePlayback() {
+            isPlaying = false;
+            document.getElementById("play-icon").innerHTML = `<svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/></svg>`;
+            clearInterval(playbackInterval);
+        }
+
+        function seekVideo(val) {
+            if (totalFrames === 0) return;
+            currentFrameIdx = Math.floor((val / 100) * (totalFrames - 1));
+            renderCurrentFrame();
+        }
+
+        function renderCurrentFrame() {
+            if (totalFrames === 0) return;
+
+            const frameStr = String(currentFrameIdx + 1).padStart(6, '0');
+            // Force reload to prevent caching issue
+            playerFrame.src = `/api/outputs/frames/frame_${frameStr}.jpg?t=` + new Date().getTime();
+
+            // Sync time label
+            const timeSecs = currentFrameIdx / fps;
+            document.getElementById("current-time-label").innerText = formatTime(timeSecs);
+
+            // Sync slider position
+            const pct = (currentFrameIdx / (totalFrames - 1)) * 100;
+            progressSlider.value = pct;
+
+            // Sync grids & overlay metrics
+            syncTimelineMetrics(timeSecs);
+        }
+
+        function formatTime(secs) {
+            const m = Math.floor(secs / 60);
+            const s = Math.floor(secs % 60);
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        // 3. Telemetry Synchronization
+        function syncTimelineMetrics(timeSecs) {
+            if (telemetryData.length === 0) return;
+
+            // Find frame nearest to current timestamp
+            const frame_id = Math.round(timeSecs * 15); // assumed 15 fps
+
+            // Filter telemetry for this frame
+            const frameMetrics = telemetryData.filter(d => d.frame_id === frame_id);
+            if (frameMetrics.length === 0) return;
+
+            // Calculate global aggregates for this frame
+            let totalCrowd = 0;
+            let congestedGrids = 0;
+            let currentAlerts = [];
+
+            frameMetrics.forEach(cell => {
+                totalCrowd += cell.crowd_count;
+                if (cell.risk_level === 'ORANGE' || cell.risk_level === 'RED') {
+                    congestedGrids++;
+                }
+
+                // Track active alerts
+                if (cell.risk_level === 'RED') {
+                    currentAlerts.push({
+                        id: cell.grid_id,
+                        type: 'DANGER',
+                        desc: `Critical crowd flow risk at Grid ${cell.grid_id} (Density: ${cell.crowd_count})`
+                    });
+                } else if (cell.flow_conflict) {
+                    currentAlerts.push({
+                        id: cell.grid_id,
+                        type: 'WARNING',
+                        desc: `Opposite flow detected at Grid ${cell.grid_id} (Direction: ${cell.direction})`
+                    });
+                }
+            });
+
+            // Update Dashboard HUD
+            document.getElementById("tele-crowd-total").innerText = Math.round(totalCrowd);
+            document.getElementById("tele-congested").innerText = congestedGrids;
+
+            // Draw overlay cells on canvas (to match playback dynamically!)
+            drawGridOverlay(frameMetrics);
+
+            // Update Alerts list
+            renderAlertsPanel(currentAlerts);
+
+            // Update charts indicator position
+            drawChartsPlayhead(timeSecs);
+        }
+
+        function renderAlertsPanel(alerts) {
+            const container = document.getElementById("alerts-log-container");
+            if (alerts.length === 0) {
+                container.innerHTML = `<div style="padding:20px; text-align:center; color:var(--color-text-muted); font-size:12px;">No active risk alerts inside corridor.</div>`;
+                return;
+            }
+
+            container.innerHTML = alerts.map(a => `
+                <div class="alert-item ${a.type === 'DANGER' ? 'danger' : 'warning'}">
+                    <div class="alert-meta">
+                        <span>GRID ${a.id}</span>
+                        <span>ACTIVE</span>
+                    </div>
+                    <div class="alert-desc">${a.desc}</div>
+                </div>
+            `).join('');
+        }
+
+        // 4. Draw Overlay on player canvas
+        function drawGridOverlay(frameMetrics) {
+            const rect = playerFrame.getBoundingClientRect();
+            overlayCanvas.width = rect.width;
+            overlayCanvas.height = rect.height;
+
+            // If image is not loaded yet or has 0 dimensions, skip
+            if (playerFrame.naturalWidth === 0) return;
+
+            // Find video aspect ratio
+            const videoRatio = playerFrame.naturalWidth / playerFrame.naturalHeight;
+            const elementRatio = rect.width / rect.height;
+
+            let drawW = rect.width;
+            let drawH = rect.height;
+            let offsetX = 0;
+            let offsetY = 0;
+
+            if (elementRatio > videoRatio) {
+                drawW = rect.height * videoRatio;
+                offsetX = (rect.width - drawW) / 2;
+            } else {
+                drawH = rect.width / videoRatio;
+                offsetY = (rect.height - drawH) / 2;
+            }
+
+            // Map coordinates from standard width/height to canvas display dimensions
+            const scaleX = drawW / playerFrame.naturalWidth;
+            const scaleY = drawH / playerFrame.naturalHeight;
+
+            overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+
+            frameMetrics.forEach(cell => {
+                const x1 = cell.x1 * scaleX + offsetX;
+                const y1 = cell.y1 * scaleY + offsetY;
+                const w = (cell.x2 - cell.x1) * scaleX;
+                const h = (cell.y2 - cell.y1) * scaleY;
+
+                // Color based on risk level
+                let riskColor = 'rgba(46, 204, 113, 0.25)';
+                let borderStroke = 'rgba(46, 204, 113, 0.8)';
+
+                if (cell.risk_level === 'YELLOW') {
+                    riskColor = 'rgba(241, 196, 15, 0.25)';
+                    borderStroke = 'rgba(241, 196, 15, 0.8)';
+                } else if (cell.risk_level === 'ORANGE') {
+                    riskColor = 'rgba(230, 126, 34, 0.35)';
+                    borderStroke = 'rgba(230, 126, 34, 0.8)';
+                } else if (cell.risk_level === 'RED') {
+                    riskColor = 'rgba(231, 76, 60, 0.45)';
+                    borderStroke = 'rgba(231, 76, 60, 0.9)';
+                }
+
+                // Fill Box
+                overlayCtx.fillStyle = riskColor;
+                overlayCtx.fillRect(x1, y1, w, h);
+
+                // Draw Border
+                overlayCtx.strokeStyle = borderStroke;
+                overlayCtx.lineWidth = 1;
+                overlayCtx.strokeRect(x1, y1, w, h);
+
+                // Draw arrow indicator
+                if (cell.motion_magnitude > 0.5) {
+                    const cx = x1 + w/2;
+                    const cy = y1 + h/2;
+                    // scale arrow based on speed
+                    const len = Math.min(cell.motion_magnitude * 5, w / 2 - 2);
+                    const angleRad = Math.atan2(cell.mean_dy, cell.mean_dx);
+
+                    const ex = cx + Math.cos(angleRad) * len;
+                    const ey = cy + Math.sin(angleRad) * len;
+
+                    overlayCtx.strokeStyle = '#ffffff';
+                    overlayCtx.lineWidth = 2;
+                    overlayCtx.beginPath();
+                    overlayCtx.moveTo(cx, cy);
+                    overlayCtx.lineTo(ex, ey);
+                    overlayCtx.stroke();
+                }
+            });
+
+            // Binds hover detection on the canvas overlay
+            overlayCanvas.onmousemove = (e) => {
+                const mouseX = e.offsetX;
+                const mouseY = e.offsetY;
+
+                // Find matching cell
+                const matchedCell = frameMetrics.find(cell => {
+                    const x1 = cell.x1 * scaleX + offsetX;
+                    const y1 = cell.y1 * scaleY + offsetY;
+                    const x2 = cell.x2 * scaleX + offsetX;
+                    const y2 = cell.y2 * scaleY + offsetY;
+                    return mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2;
+                });
+
+                const hoverCard = document.getElementById("hover-overlay");
+                if (matchedCell) {
+                    hoverCard.style.display = 'block';
+                    hoverCard.style.left = `${e.clientX + 15}px`;
+                    hoverCard.style.top = `${e.clientY + 15}px`;
+
+                    document.getElementById("pop-grid-id").innerText = matchedCell.grid_id;
+                    document.getElementById("pop-count").innerText = Math.round(matchedCell.crowd_count);
+                    document.getElementById("pop-speed").innerText = `${matchedCell.speed_level} (${matchedCell.direction})`;
+                    document.getElementById("pop-coherence").innerText = `${Math.round(matchedCell.coherence * 100)}%`;
+
+                    const riskEl = document.getElementById("pop-risk");
+                    riskEl.innerText = matchedCell.risk_level;
+                    if (matchedCell.risk_level === 'GREEN') riskEl.style.color = 'var(--color-success)';
+                    else if (matchedCell.risk_level === 'YELLOW') riskEl.style.color = 'var(--color-warning)';
+                    else if (matchedCell.risk_level === 'ORANGE') riskEl.style.color = 'var(--color-orange)';
+                    else riskEl.style.color = 'var(--color-danger)';
+                } else {
+                    hoverCard.style.display = 'none';
+                }
+            };
+
+            overlayCanvas.onmouseleave = () => {
+                document.getElementById("hover-overlay").style.display = 'none';
+            };
+        }
+
+        // 5. SVG Charting System (Built-in offline drawing)
+        function renderCharts() {
+            // Extract aggregate metrics per frame timestamp
+            const timeMap = {};
+            telemetryData.forEach(d => {
+                const t = d.timestamp_sec;
+                if (!timeMap[t]) {
+                    timeMap[t] = { count: 0, speed: 0, count_speed: 0, congestion: 0, count_cells: 0 };
+                }
+                timeMap[t].count += d.crowd_count;
+                timeMap[t].speed += d.motion_magnitude;
+                timeMap[t].congestion += d.risk_score;
+                timeMap[t].count_cells += 1;
+            });
+
+            const timeline = Object.keys(timeMap).sort((a,b) => parseFloat(a) - parseFloat(b)).map(t => {
+                const item = timeMap[t];
+                return {
+                    time: parseFloat(t),
+                    count: item.count,
+                    speed: item.speed / item.count_cells,
+                    congestion: item.congestion / item.count_cells
+                };
+            });
+
+            if (timeline.length === 0) return;
+
+            // Draw the three SVG charts
+            drawSVGChart("chart-density", timeline, "count", "#3b82f6");
+            drawSVGChart("chart-speed", timeline, "speed", "#2ecc71");
+            drawSVGChart("chart-congestion", timeline, "congestion", "#e67e22");
+        }
+
+        function drawSVGChart(elementId, data, key, color) {
+            const svg = document.getElementById(elementId);
+            svg.innerHTML = '';
+
+            const w = svg.clientWidth || 300;
+            const h = 100;
+            svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+
+            const vals = data.map(d => d[key]);
+            const minVal = 0;
+            const maxVal = Math.max(...vals, 1) * 1.1;
+            const maxTime = data[data.length - 1].time;
+
+            // Generate points string
+            let pointsStr = '';
+            data.forEach((d, idx) => {
+                const x = (d.time / maxTime) * (w - 20) + 10;
+                const y = h - ((d[key] - minVal) / (maxVal - minVal)) * (h - 20) - 10;
+                pointsStr += `${x},${y} `;
+            });
+
+            // Draw background grid lines
+            for (let i = 1; i <= 3; i++) {
+                const lineY = h - (i * (h - 20) / 4) - 10;
+                const gridLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                gridLine.setAttribute("x1", "0");
+                gridLine.setAttribute("y1", lineY);
+                gridLine.setAttribute("x2", w);
+                gridLine.setAttribute("y2", lineY);
+                gridLine.setAttribute("stroke", "rgba(255, 255, 255, 0.05)");
+                gridLine.setAttribute("stroke-dasharray", "4,4");
+                svg.appendChild(gridLine);
+            }
+
+            // Draw Area Gradient
+            const fillPoints = `10,${h - 10} ` + pointsStr + `${w - 10},${h - 10}`;
+            const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+            polygon.setAttribute("points", fillPoints);
+            polygon.setAttribute("fill", color);
+            polygon.setAttribute("fill-opacity", "0.1");
+            svg.appendChild(polygon);
+
+            // Draw Line
+            const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+            polyline.setAttribute("points", pointsStr);
+            polyline.setAttribute("fill", "none");
+            polyline.setAttribute("stroke", color);
+            polyline.setAttribute("stroke-width", "2");
+            polyline.setAttribute("stroke-linejoin", "round");
+            svg.appendChild(polyline);
+
+            // Draw Playhead line container
+            const playhead = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            playhead.setAttribute("id", `${elementId}-playhead`);
+            playhead.setAttribute("x1", "10");
+            playhead.setAttribute("y1", "0");
+            playhead.setAttribute("x2", "10");
+            playhead.setAttribute("y2", h);
+            playhead.setAttribute("stroke", "#e74c3c");
+            playhead.setAttribute("stroke-width", "1.5");
+            svg.appendChild(playhead);
+        }
+
+        function drawChartsPlayhead(timeSecs) {
+            if (telemetryData.length === 0) return;
+            const maxTime = totalDuration || 1;
+            const charts = ["chart-density", "chart-speed", "chart-congestion"];
+
+            charts.forEach(id => {
+                const svg = document.getElementById(id);
+                const w = svg.clientWidth || 300;
+                const playhead = document.getElementById(`${id}-playhead`);
+                if (playhead) {
+                    const x = (timeSecs / maxTime) * (w - 20) + 10;
+                    playhead.setAttribute("x1", x);
+                    playhead.setAttribute("x2", x);
+                }
+            });
+        }
+
+        // 6. Labeler Workspace Implementation
+        let labelerCanvas = document.getElementById("canvas-dots");
+        let labelerCtx = labelerCanvas.getContext("2d");
+        let labelerImg = document.getElementById("labeler-img");
+
+        function scanCustomPath() {
+            const path = document.getElementById("input-dataset-path").value;
+            if (!path) return;
+
+            fetch("/api/scan_path", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ path: path })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    alert(`Error: ${data.error}`);
+                    return;
+                }
+                currentSequencePath = data.path;
+                currentSequenceName = data.name;
+
+                // Fetch frame names
+                loadFramesList();
+            })
+            .catch(err => alert("Server scanning error. Ensure server is running."));
+        }
+
+        function loadFramesList() {
+            fetch("/api/sequence/frames", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ path: currentSequencePath })
+            })
+            .then(res => res.json())
+            .then(data => {
+                frameList = data.frames;
+                framesCount = frameList.length;
+                selectedFrameIdx = 0;
+
+                // Fetch existing labels for this sequence
+                fetchLabelsData();
+            });
+        }
+
+        function fetchLabelsData() {
+            fetch("/api/labels", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: currentSequenceName })
+            })
+            .then(res => res.json())
+            .then(data => {
+                labels = data.frames || {};
+                renderFramesListUI();
+                selectFrame(0);
+            });
+        }
+
+        function renderFramesListUI() {
+            const container = document.getElementById("label-frames-container");
+            if (frameList.length === 0) {
+                container.innerHTML = '<div style="padding:20px; text-align:center; color:var(--color-text-muted); font-size:12px;">No images inside path.</div>';
+                return;
+            }
+
+            container.innerHTML = frameList.map((filename, idx) => {
+                const dotCount = labels[filename] ? labels[filename].length : 0;
+                return `
+                    <div class="frame-item ${idx === selectedFrameIdx ? 'selected' : ''}" id="frame-item-${idx}" onclick="selectFrame(${idx})">
+                        <span>${filename}</span>
+                        ${dotCount > 0 ? `<span class="dot-badge" id="badge-${idx}">${dotCount} dots</span>` : `<span class="dot-badge" id="badge-${idx}" style="background:rgba(255,255,255,0.05); color:var(--color-text-muted)">0 dots</span>`}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectFrame(idx) {
+            // Update selection in list UI
+            document.querySelectorAll(".frame-item").forEach(el => el.classList.remove("selected"));
+            const activeItem = document.getElementById(`frame-item-${idx}`);
+            if (activeItem) {
+                activeItem.classList.add("selected");
+                activeItem.scrollIntoView({ block: "nearest" });
+            }
+
+            selectedFrameIdx = idx;
+            document.getElementById("labeler-frame-counter").innerText = `Frame ${idx + 1} / ${framesCount}`;
+
+            // Load image into editor
+            const filename = frameList[idx];
+            labelerImg.src = `/api/sequence/frame_file?dir=${encodeURIComponent(currentSequencePath)}&file=${encodeURIComponent(filename)}`;
+
+            // Once image loads, draw circles
+            labelerImg.onload = () => {
+                resizeCanvas();
+                drawDots();
+            };
+        }
+
+        function resizeCanvas() {
+            labelerCanvas.width = labelerImg.clientWidth;
+            labelerCanvas.height = labelerImg.clientHeight;
+        }
+
+        // Draw annotation dots
+        function drawDots() {
+            labelerCtx.clearRect(0, 0, labelerCanvas.width, labelerCanvas.height);
+            const filename = frameList[selectedFrameIdx];
+            const frameDots = labels[filename] || [];
+
+            // Scale points based on current display size vs original size
+            const scaleX = labelerCanvas.width / labelerImg.naturalWidth;
+            const scaleY = labelerCanvas.height / labelerImg.naturalHeight;
+
+            frameDots.forEach(pt => {
+                const cx = pt.x * scaleX;
+                const cy = pt.y * scaleY;
+
+                // Draw dot outline
+                labelerCtx.fillStyle = "rgba(231, 76, 60, 0.85)";
+                labelerCtx.beginPath();
+                labelerCtx.arc(cx, cy, 5, 0, 2 * Math.PI);
+                labelerCtx.fill();
+
+                labelerCtx.strokeStyle = "#ffffff";
+                labelerCtx.lineWidth = 1.5;
+                labelerCtx.stroke();
+            });
+        }
+
+        // Click to add annotation dot
+        function canvasClick(e) {
+            if (frameList.length === 0) return;
+            const rect = labelerCanvas.getBoundingClientRect();
+            const displayX = e.clientX - rect.left;
+            const displayY = e.clientY - rect.top;
+
+            // Convert to original coordinates
+            const origX = Math.round(displayX * (labelerImg.naturalWidth / labelerCanvas.width));
+            const origY = Math.round(displayY * (labelerImg.naturalHeight / labelerCanvas.height));
+
+            const filename = frameList[selectedFrameIdx];
+            if (!labels[filename]) labels[filename] = [];
+
+            // Check if click is on an existing dot (for removal)
+            const clickThreshold = 15; // px in original coordinate space
+            const matchIndex = labels[filename].findIndex(pt => {
+                const d = Math.sqrt((pt.x - origX)**2 + (pt.y - origY)**2);
+                return d < clickThreshold;
+            });
+
+            if (matchIndex !== -1) {
+                // Remove dot
+                labels[filename].splice(matchIndex, 1);
+            } else {
+                // Add dot
+                labels[filename].push({ x: origX, y: origY });
+            }
+
+            // Update badge UI
+            const badge = document.getElementById(`badge-${selectedFrameIdx}`);
+            const count = labels[filename].length;
+            if (count > 0) {
+                badge.innerText = `${count} dots`;
+                badge.style.background = 'var(--color-primary)';
+                badge.style.color = 'white';
+            } else {
+                badge.innerText = '0 dots';
+                badge.style.background = 'rgba(255,255,255,0.05)';
+                badge.style.color = 'var(--color-text-muted)';
+            }
+
+            drawDots();
+        }
+
+        function stepFrame(step) {
+            let nextIdx = selectedFrameIdx + step;
+            if (nextIdx >= 0 && nextIdx < framesCount) {
+                selectFrame(nextIdx);
+            }
+        }
+
+        function clearCurrentFrame() {
+            const filename = frameList[selectedFrameIdx];
+            labels[filename] = [];
+
+            const badge = document.getElementById(`badge-${selectedFrameIdx}`);
+            badge.innerText = '0 dots';
+            badge.style.background = 'rgba(255,255,255,0.05)';
+            badge.style.color = 'var(--color-text-muted)';
+
+            drawDots();
+        }
+
+        // Copies previous frame labels to current frame (major UX speedup)
+        function copyFromPreviousFrame() {
+            if (selectedFrameIdx === 0) return;
+            const prevFilename = frameList[selectedFrameIdx - 1];
+            const currFilename = frameList[selectedFrameIdx];
+
+            // Deep copy points list
+            const prevPoints = labels[prevFilename] || [];
+            labels[currFilename] = JSON.parse(JSON.stringify(prevPoints));
+
+            const badge = document.getElementById(`badge-${selectedFrameIdx}`);
+            const count = labels[currFilename].length;
+            if (count > 0) {
+                badge.innerText = `${count} dots`;
+                badge.style.background = 'var(--color-primary)';
+                badge.style.color = 'white';
+            }
+
+            drawDots();
+        }
+
+        function saveAnnotations() {
+            fetch("/api/labels/save", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: currentSequenceName,
+                    labels: { frames: labels }
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Annotations saved successfully to configs/labels folder.");
+                } else {
+                    alert("Error saving labels.");
+                }
+            });
+        }
+
+        // 7. Trigger Pipeline processing
+        function triggerPipeline() {
+            // First save
+            saveAnnotations();
+
+            const expDir = document.getElementById("select-expected-dir").value;
+
+            // Trigger processing API
+            alert("Starting Local Pipeline. The process will run completely offline. Processing takes 5-30 seconds depending on frames count...");
+
+            fetch("/api/process", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    input_path: currentSequencePath,
+                    label_name: currentSequenceName,
+                    expected_direction: expDir
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    alert(`Execution failed: ${data.error}\nDetails: ${data.details}`);
+                    return;
+                }
+
+                alert("Processing completed successfully! Swapping to Operations replay view.");
+
+                // Swap view and load output files
+                telemetryData = data.metrics;
+
+                // Calculate frames from metrics
+                if (telemetryData.length > 0) {
+                    totalFrames = Math.max(...telemetryData.map(d => d.frame_id)) + 1;
+                    totalDuration = totalFrames / fps;
+                    document.getElementById("duration-label").innerText = formatTime(totalDuration);
+                } else {
+                    totalFrames = 0;
+                    totalDuration = 0;
+                    document.getElementById("duration-label").innerText = "0:00";
+                }
+
+                currentFrameIdx = 0;
+
+                // Switch mode
+                switchMode('ops');
+
+                // Draw charts and load first frame
+                setTimeout(() => {
+                    renderCurrentFrame();
+                    renderCharts();
+                }, 500);
+            })
+            .catch(err => {
+                alert("Connection lost or pipeline error: " + err);
+            });
+        }
+
+        // 8. Health Check and WS Connection
+        function checkBackendStatus(backendEnabled, backendUrl) {
+            const tag = document.getElementById("system-status-tag");
+            const dot = document.getElementById("system-status-dot");
+            const text = document.getElementById("system-status-text");
+
+            if (!backendEnabled) {
+                // Standalone local mode
+                tag.style.background = "rgba(46, 204, 113, 0.1)";
+                tag.style.borderColor = "rgba(46, 204, 113, 0.2)";
+                tag.style.color = "var(--color-success)";
+                dot.style.backgroundColor = "var(--color-success)";
+                text.innerText = "Offline Operational (Local)";
+                return;
+            }
+
+            // Check if Go Backend is reachable
+            fetch(backendUrl + "/api/v1/system/health")
+            .then(res => res.json())
+            .then(health => {
+                if (health.status === "UP") {
+                    tag.style.background = "rgba(59, 130, 246, 0.15)";
+                    tag.style.borderColor = "rgba(59, 130, 246, 0.3)";
+                    tag.style.color = "var(--color-primary)";
+                    dot.style.backgroundColor = "var(--color-primary)";
+                    text.innerText = "Online (Go SQL Engine)";
+
+                    // Initialize live websocket stream
+                    connectWebSocket(backendUrl);
+                } else {
+                    throw new Error("Go backend status not UP");
+                }
+            })
+            .catch(err => {
+                // Go enabled in config but server offline
+                tag.style.background = "rgba(231, 76, 60, 0.15)";
+                tag.style.borderColor = "rgba(231, 76, 60, 0.3)";
+                tag.style.color = "var(--color-danger)";
+                dot.style.backgroundColor = "var(--color-danger)";
+                text.innerText = "SQL Backend Offline";
+            });
+        }
+
+        function connectWebSocket(backendUrl) {
+            const wsUrl = backendUrl.replace("http://", "ws://") + "/api/v1/live/ws";
+            if (wsConnection) {
+                wsConnection.close();
+            }
+
+            wsConnection = new WebSocket(wsUrl);
+            wsConnection.onopen = () => {
+                console.log("WebSocket connected to Go Engine.");
+            };
+
+            wsConnection.onmessage = (e) => {
+                try {
+                    const metrics = JSON.parse(e.data);
+                    console.log("Received live WebSocket metrics batch:", metrics);
+                    // Update latest telemetry in memory and update display
+                    telemetryData = metrics;
+                    if (telemetryData.length > 0) {
+                        totalFrames = Math.max(...telemetryData.map(d => d.frame_id)) + 1;
+                        totalDuration = totalFrames / fps;
+                        document.getElementById("duration-label").innerText = formatTime(totalDuration);
+                        renderCharts();
+                        syncTimelineMetrics(currentFrameIdx / fps);
+                    }
+                } catch(err) {
+                    console.error("WS parse error:", err);
+                }
+            };
+
+            wsConnection.onclose = () => {
+                console.log("WS connection closed. Reconnecting in 5s...");
+                setTimeout(() => connectWebSocket(backendUrl), 5000);
+            };
+        }
+
+        // 9. Startup Initialization
+        function initializeDashboard() {
+            fetch("/api/outputs/status")
+            .then(res => res.json())
+            .then(status => {
+                // Dynamic Status Badge and WS setup
+                checkBackendStatus(status.backendEnabled, status.backendUrl);
+
+                // If outputs exist, auto-load them immediately
+                if (status.exists) {
+                    fetch("/api/outputs/grid_metrics.json")
+                    .then(res => res.json())
+                    .then(data => {
+                        telemetryData = data;
+                        if (telemetryData.length > 0) {
+                            totalFrames = Math.max(...telemetryData.map(d => d.frame_id)) + 1;
+                            totalDuration = totalFrames / fps;
+                            document.getElementById("duration-label").innerText = formatTime(totalDuration);
+
+                            currentFrameIdx = 0;
+                            renderCurrentFrame();
+                            renderCharts();
+                        }
+                    })
+                    .catch(err => console.log("No previous metrics loaded yet."));
+                }
+            })
+            .catch(err => {
+                console.log("Offline mode: Flask server not responding yet.");
+            });
+        }
+
+        window.addEventListener("DOMContentLoaded", initializeDashboard);
+
+        // Window Resize Event
+        window.addEventListener("resize", () => {
+            if (currentMode === 'ops' && telemetryData.length > 0) {
+                syncTimelineMetrics(currentFrameIdx / fps);
+                renderCharts();
+            } else if (currentMode === 'label' && frameList.length > 0) {
+                resizeCanvas();
+                drawDots();
+            }
+        });
+    </script>
+</body>
+</html>

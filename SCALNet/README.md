@@ -70,6 +70,19 @@ You can write a script to do so according to the train.txt, val.txt and test.txt
 python train.py --model DLANet --dataset NWPU --batch_size 32 --loss LocLoss --gpus 0 --lr 0.0001 --epochs 20 --save_model_interval 2 --preload --save
 ```
 
+#### ShanghaiTech (Python 3)
+
+ShanghaiTech Part A and Part B can be fine-tuned from a SCALNet checkpoint
+without converting the original MAT point annotations:
+
+```
+python train_shanghaitech.py --dataset-root /path/to/ShanghaiTech --parts A B --epochs 5 --batch-size 2
+```
+
+On a CPU-only machine, `--freeze-backbone` trains only the localization and
+density heads. Outputs are written below `outputs/shanghaitech_scalnet/` and are
+ignored by Git. Use `--max-train-samples 2 --max-val-samples 2` for a smoke test.
+
 Please refer to /src/train_options.py for more options; Default scripts for training avaliable on /scripts/train.sh
 ### Testing on the validation set
 ```
